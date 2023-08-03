@@ -22,10 +22,9 @@ local StartRecord = function()
         game:GetService("RunService").Heartbeat:wait()
         local Character = getChar()
         table.insert(Frames, {
-            CF = Character.HumanoidRootPart.CFrame,
-            V = Character.HumanoidRootPart.Velocity,
-            T = tick() - TimeStart,
-            S = Character.Humanoid:GetState().Value
+            Character.HumanoidRootPart.CFrame,
+            Character.Humanoid:GetState().Value,
+            tick() - TimeStart
         })
     end
 end
@@ -44,16 +43,15 @@ local PlayTAS = function()
     TASLoop = game:GetService("RunService").Heartbeat:Connect(function()
         local NewFrames = OldFrame + 60
         local CurrentTime = tick()
-        if (CurrentTime - TimePlay) >= Frames[FrameCount].T then
+        if (CurrentTime - TimePlay) >= Frames[FrameCount][3] then
             TASLoop:Disconnect()
         end
         for i = OldFrame, NewFrames do
             local Frame = Frames[i]
-            if Frame.T <= CurrentTime - TimePlay then
+            if Frame[3] <= CurrentTime - TimePlay then
                 OldFrame = i
-                Character.HumanoidRootPart.CFrame = Frame.CF
-                Character.HumanoidRootPart.Velocity = Frame.V
-                Character.Humanoid:ChangeState(Frame.S)
+                Character.HumanoidRootPart.CFrame = Frame[1]
+                Character.Humanoid:ChangeState(Frame[2])
             end
         end
     end)
@@ -125,4 +123,3 @@ local Keybind = Tab:CreateKeybind({
    Flag = "3",
    Callback = PlayTAS,
 })
-
