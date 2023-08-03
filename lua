@@ -103,7 +103,7 @@ local Button = Tab:CreateButton({
 
 
 local Keybind = Tab:CreateKeybind({
-   Name = "Stop Recording BIND",
+   Name = "Start Recording BIND",
    CurrentKeybind = "",
    HoldToInteract = false,
    Flag = "1",
