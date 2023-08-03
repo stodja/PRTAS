@@ -13,6 +13,52 @@ local getChar = function()
     end
 end
 
+
+local StartRecord = function()
+    Frames = {}
+    Running = true
+    TimeStart = tick()
+    while Running == true do
+        game:GetService("RunService").Heartbeat:wait()
+        local Character = getChar()
+        table.insert(Frames, {
+            CF = Character.HumanoidRootPart.CFrame,
+            V = Character.HumanoidRootPart.Velocity,
+            T = tick() - TimeStart,
+            S = Character.Humanoid:GetState().Value
+        })
+    end
+end
+
+local StopRecord = function()
+    Running = false
+end
+
+local PlayTAS = function()
+    local Character = getChar()
+    local TimePlay = tick()
+    local FrameCount = #Frames
+    local NewFrames = FrameCount
+    local OldFrame = 1
+    local TASLoop
+    TASLoop = game:GetService("RunService").Heartbeat:Connect(function()
+        local NewFrames = OldFrame + 60
+        local CurrentTime = tick()
+        if (CurrentTime - TimePlay) >= Frames[FrameCount].T then
+            TASLoop:Disconnect()
+        end
+        for i = OldFrame, NewFrames do
+            local Frame = Frames[i]
+            if Frame.T <= CurrentTime - TimePlay then
+                OldFrame = i
+                Character.HumanoidRootPart.CFrame = Frame.CF
+                Character.HumanoidRootPart.Velocity = Frame.V
+                Character.Humanoid:ChangeState(Frame.S)
+            end
+        end
+    end)
+end
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
    Name = "Global TAS",
@@ -43,53 +89,40 @@ local Tab = Window:CreateTab("Control", 4483362458)
 local Section = Tab:CreateSection("Save")
 local Button = Tab:CreateButton({
    Name = "Start recording",
-   Callback = function()
-        Frames = {}
-        Running = true
-        TimeStart = tick()
-        while Running == true do
-            game:GetService("RunService").Heartbeat:wait()
-            local Character = getChar()
-            table.insert(Frames, {
-                CF = Character.HumanoidRootPart.CFrame,
-                V = Character.HumanoidRootPart.Velocity,
-                T = tick() - TimeStart,
-                S = Character.Humanoid:GetState().Value
-            })
-        end
-   end,
+   Callback = StartRecord,
 })
 local Button = Tab:CreateButton({
    Name = "Stop recording.",
-   Callback = function()
-        Running = false
-   end,
+   Callback = StopRecord,
 })
 
 local Button = Tab:CreateButton({
    Name = "Play",
-   Callback = function()
-        local Character = getChar()
-        local TimePlay = tick()
-        local FrameCount = #Frames
-        local NewFrames = FrameCount
-        local OldFrame = 1
-        local TASLoop
-        TASLoop = game:GetService("RunService").Heartbeat:Connect(function()
-            local NewFrames = OldFrame + 60
-            local CurrentTime = tick()
-            if (CurrentTime - TimePlay) >= Frames[FrameCount].T then
-                TASLoop:Disconnect()
-            end
-            for i = OldFrame, NewFrames do
-                local Frame = Frames[i]
-                if Frame.T <= CurrentTime - TimePlay then
-                    OldFrame = i
-                    Character.HumanoidRootPart.CFrame = Frame.CF
-                    Character.HumanoidRootPart.Velocity = Frame.V
-                    Character.Humanoid:ChangeState(Frame.S)
-                end
-            end
-        end)
-   end,
+   Callback = PlayTAS,
 })
+
+
+local Keybind = Tab:CreateKeybind({
+   Name = "Stop Recording BIND",
+   CurrentKeybind = "",
+   HoldToInteract = false,
+   Flag = "1",
+   Callback = StartRecord,
+})
+
+local Keybind = Tab:CreateKeybind({
+   Name = "Stop Recording BIND",
+   CurrentKeybind = "",
+   HoldToInteract = false,
+   Flag = "2",
+   Callback = StopRecord,
+})
+
+local Keybind = Tab:CreateKeybind({
+   Name = "Play BIND",
+   CurrentKeybind = "",
+   HoldToInteract = false,
+   Flag = "3",
+   Callback = PlayTAS,
+})
+
