@@ -49,10 +49,12 @@ local Button = Tab:CreateButton({
         TimeStart = tick()
         while Running == true do
             game:GetService("RunService").Heartbeat:wait()
+            local Character = getChar()
             table.insert(Frames, {
-                CF = getChar().HumanoidRootPart.CFrame,
-                V = getChar().HumanoidRootPart.Velocity,
-                T = tick() - TimeStart
+                CF = Character.HumanoidRootPart.CFrame,
+                V = Character.HumanoidRootPart.Velocity,
+                T = tick() - TimeStart,
+                S = Character.Humanoid:GetState().Value
             })
         end
    end,
@@ -69,16 +71,23 @@ local Button = Tab:CreateButton({
    Callback = function()
         local Character = getChar()
         local TimePlay = tick()
+        local FrameCount = #Frames
+        local NewFrames = FrameCount
+        local OldFrame = 1
         local TASLoop
         TASLoop = game:GetService("RunService").Heartbeat:Connect(function()
-            local FrameCount = #Frames
+            local NewFrames = OldFrame + 60
             local CurrentTime = tick()
-            if CurrentTime - TimePlay >= Frames[FrameCount].T then TASLoop:Disconnect() end
-            for i = 1, FrameCount do
+            if (CurrentTime - TimePlay) >= Frames[FrameCount].T then
+                TASLoop:Disconnect()
+            end
+            for i = OldFrame, NewFrames do
                 local Frame = Frames[i]
                 if Frame.T <= CurrentTime - TimePlay then
+                    OldFrame = i
                     Character.HumanoidRootPart.CFrame = Frame.CF
                     Character.HumanoidRootPart.Velocity = Frame.V
+                    Character.Humanoid:ChangeState(Frame.S)
                 end
             end
         end)
