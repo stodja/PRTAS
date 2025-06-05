@@ -25,7 +25,7 @@ local StartRecord = function()
             Character.HumanoidRootPart.CFrame,
             Character.Humanoid:GetState().Value,
             tick() - TimeStart,
-            Character.HumanoidRootPart.CFrame.LookVector
+            workspace.CurrentCamera.CFrame
         })
     end
 end
@@ -39,6 +39,10 @@ local PlayTAS = function()
     local TimePlay = tick()
     local FrameCount = #Frames
     local OldFrame = 1
+    local tasMap = workspace.Multiplayer.Map
+    local start = tasMap:FindFirstChild("Spawn", true).CFrame * CFrame.new(0,3,0)
+    local Camera = workspace.CurrentCamera
+    Camera.CameraType = Enum.CameraType.Scriptable
 
     local TASLoop
     TASLoop = game:GetService("RunService").Heartbeat:Connect(function()
@@ -51,11 +55,11 @@ local PlayTAS = function()
 
         for i = OldFrame, NewFrames do
             local Frame = Frames[i]
-            if Frame and Frame[3] <= (CurrentTime - TimePlay) then
+            if Frame[3] <= (CurrentTime - TimePlay) then
                 OldFrame = i
                 Character.HumanoidRootPart.CFrame = Frame[1]
-                Character.HumanoidRootPart.CFrame.LookVector = Frame[4]
                 Character.Humanoid:ChangeState(Frame[2])
+                Camera.CFrame = start:ToWorldSpace(Frame[4])
             end
         end
     end)
