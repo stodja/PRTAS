@@ -24,8 +24,8 @@ local StartRecord = function()
         table.insert(Frames, {
             Character.HumanoidRootPart.CFrame,
             Character.Humanoid:GetState().Value,
-            tick() - TimeStart
-            roundVector(workspace.CurrentCamera.CFrame),
+            tick() - TimeStart,
+            roundVector(workspace.CurrentCamera.CFrame)
         })
     end
 end
