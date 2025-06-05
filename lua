@@ -25,6 +25,7 @@ local StartRecord = function()
             Character.HumanoidRootPart.CFrame,
             Character.Humanoid:GetState().Value,
             tick() - TimeStart
+            roundVector(workspace.CurrentCamera.CFrame),
         })
     end
 end
@@ -52,6 +53,7 @@ local PlayTAS = function()
                 OldFrame = i
                 Character.HumanoidRootPart.CFrame = Frame[1]
                 Character.Humanoid:ChangeState(Frame[2])
+                workspace.CurrentCamera.CFrame = Frame[4]
             end
         end
     end)
